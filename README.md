@@ -12,19 +12,49 @@ So, I decided to help them and build an Automatic Feeder using Azure IoT, a Wio 
 
 Once the feeder was ready, I decided to add a new feature to the scenario, detecting when a squirrel 🐿️ is nearby the feeder. In this repository I'll share:
 
-- How to create an object recognition model using [LOBE](https://www.lobe.ai/).
-- How to export the model to a Tensor Flow image format.
+- How to create an image recognition model using [LOBE](https://www.lobe.ai/).
+- How to export the model to a TensorFlow image format.
 - How to run the model in an Azure Function.
 
 [<img src="img/squirrel_detected.jpg" width="250"/>](squirrel_detected.jpg)
 
 ## LOBE AI
 
-[LOBE](https://www.lobe.ai/) is an image recognition service that lets you build, deploy, and improve your own image identifier models. 
+[LOBE](https://www.lobe.ai/) is a free, easy-to-use Microsoft desktop application that allows you to build, manage, and use custom machine learning models. With Lobe, you can create an image classification model to categorize images into labels that represent their content. 
+
+Here's a summary of how to prepare a model in Lobe:
+- Import and label images.
+- Train your model.
+- Evaluate training results.
+- Play with your model to experiment with different scenarios.
+- Export and use your model in an app.
+
+The [Overview of image classification model by Lobe](https://docs.microsoft.com/en-us/ai-builder/lobe-overview) section contains step-by-step instructions that let you make calls to the service and get results in a short period of time. 
+
+You can use the images in the "[LOBE/Train/](LOBE/Train/)" directory in this repository to train your model.
+
+<img src="img/LabeledImagesInLobeProject.jpg" width="450"/>
+
+
+Here is the model performing live recognition in action: 
+
+<img src="img/LobeTestImage.gif" width="650"/>
+
 
 ## Exporting the model to TensorFlow
 
 Once the project  was trained, you can export it to several formats. We will use a TensorFlow format for the Azure Function. 
+
+<img src="img/LobeExportModel.jpg" width="450"/>
+
+The exported model has several files. The following list shows the files that we use in our Azure Function:
+
+- labels.txt: The labels that the model recognizes
+- saved_model.pb: The model definition
+- signature.json: The model signature
+- example/tf_example.py.py: sample python code that uses the exported model.
+
+You can check the exported model in the "[Lobe/ExportedModel](Lobe/ExportedModel/)" directory in this repository.
 
 ## Azure Function
 
@@ -37,10 +67,56 @@ The following code is the final code for the `__ init __.py` file in the Azure F
 A couple of notes:
 
 - The function will receive a POST request with the file bytes in the body.
-- In order to use the predict file, we must import the `predict` function from the `predict.py` file using ".predict"
+- In order to use the `tf_model_helper` file, we must import the `tf_model_helper.py` function from the `tf_model_helper.py` file using ".tf_model_helper"
+- `ASSETS_PATH` and `TF_MODEL` are the variables that we will use to access the exported model. We will use os.path to resolve the current path to the exported model.
+- The result of the function will be a JSON string with the prediction. Jsonify will convert the TF_Model() image prediction to a JSON string.
 
 
 ```python
+import logging
+import azure.functions as func
+
+# Imports for image procesing
+import io
+import os
+from PIL import Image
+from flask import Flask, jsonify
+
+# Imports for prediction
+from .tf_model_helper import TFModel
+
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
+
+    results = "{}"
+    try:
+        # get and load image from POST
+        image_bytes = req.get_body()    
+        image = Image.open(io.BytesIO(image_bytes))
+
+        # Load and intialize the model and the app context
+        app = Flask(__name__)  
+
+        # load LOBE Model using the current directory
+        scriptpath = os.path.abspath(__file__)
+        scriptdir  = os.path.dirname(scriptpath)
+        ASSETS_PATH = os.path.join(scriptdir, "model")
+        TF_MODEL = TFModel(ASSETS_PATH)
+
+        with app.app_context():        
+            # prefict image and process results in json string format
+            results = TF_MODEL.predict(image)            
+            jsonresult = jsonify(results)
+            jsonStr = jsonresult.get_data(as_text=True)
+            results = jsonStr
+
+    except Exception as e:
+        logging.info(f'exception: {e}')
+        pass 
+
+    # return results
+    logging.info('Image processed. Results: ' + results)
+    return func.HttpResponse(results, status_code=200)
 ```
 
 ### Changes to `requirements.txt`
@@ -48,6 +124,17 @@ A couple of notes:
 The `requirements.txt` file will define the necessary libraries for the Azure Function. We will use the following libraries:
 
 ```text
+# DO NOT include azure-functions-worker in this file
+# The Python Worker is managed by Azure Functions platform
+# Manually managing azure-functions-worker may cause unexpected issues
+
+azure-functions
+requests
+Pillow
+numpy
+flask
+tensorflow
+opencv-python
 ```
 
 ### Sample Code
