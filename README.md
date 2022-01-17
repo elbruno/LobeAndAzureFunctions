@@ -154,15 +154,24 @@ Curl is a command line tool that allows you to send HTTP requests to a server. I
 ❯ curl http://localhost:7071/api/LobeSquirrelDetectorFunction -Method 'Post' -InFile 01.jpg
 ```
 
+<img src="img/TestUsingCurl.jpg" width="450"/>
+
+
 ### Test using Postman
 
 **Postman** is a great tool to test our function. You can use it to test the function in local mode and also to test the function once it has been deployed to Azure Functions. You can download Postman [here](https://www.postman.com/downloads/).
 
 In order to test our function we need to know the function url. In Visual Studio Code, we can get the url by clicking on the Functions section in the Azure Extension. Then we can right click on the function and select "Copy Function URL".
 
+<img src="img/CopyAzureFunctionUrl.jpg" width="450"/>
+
 Now we can go to Postman and create a new POST request using our function url. We can also add the image we want to test. Here is a live demo, with the function running locally, in Debug mode in Visual Studio Code:
 
+<img src="img/AzFncLocalTestWithPostman.gif" width="700"/>
+
 We are now ready to test our function in Azure Functions. To do so we need to deploy the function to Azure Functions. And use the new Azure Function url with the same test steps. 
+
+
 
 ## Additional Resources
 
