@@ -29,7 +29,7 @@ Here's a summary of how to prepare a model in Lobe:
 - Play with your model to experiment with different scenarios.
 - Export and use your model in an app.
 
-The [Overview of image classification model by Lobe](https://docs.microsoft.com/en-us/ai-builder/lobe-overview) section contains step-by-step instructions that let you make calls to the service and get results in a short period of time. 
+The [Overview of image classification model by Lobe](https://docs.microsoft.com/ai-builder/lobe-overview) section contains step-by-step instructions that let you make calls to the service and get results in a short period of time. 
 
 You can use the images in the "[LOBE/Train/](LOBE/Train/)" directory in this repository to train your model.
 
@@ -184,8 +184,8 @@ These links will help to understand specific implementations of the sample code:
 
 - [Microsoft Learn - Create serverless applications](https://aka.ms/CreateServerlessApps-ci)
 - [AZ-204: Implement Azure Functions](https://aka.ms/AzureFunctions-ci)
-- [Microsoft Docs - Overview of image classification model by Lobe (preview)](https://docs.microsoft.com/en-us/ai-builder/lobe-overview)
-- [Microsoft Docs - Export your image classification model from Lobe to AI Builder (preview)](https://docs.microsoft.com/en-us/ai-builder/lobe-export)
+- [Microsoft Docs - Overview of image classification model by Lobe (preview)](https://docs.microsoft.com/ai-builder/lobe-overview)
+- [Microsoft Docs - Export your image classification model from Lobe to AI Builder (preview)](https://docs.microsoft.com/ai-builder/lobe-export)
 
 In my personal blog "[ElBruno.com](https://elbruno.com)", I wrote about several scenarios on how to work and code with [LOBE](https://elbruno.com/tag/lobe/). 
 
